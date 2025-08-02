@@ -206,6 +206,7 @@ const PostForm = ({ token, user }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
+    setLoading(true);
     if (files.length === 0) {
       setError("Anda harus memilih setidaknya satu file.");
       return;
@@ -652,6 +653,7 @@ const NoteForm = ({ token, user }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
+    setLoading(true);
     if (!content.trim()) {
       setError("Catatan tidak boleh kosong.");
       return;
@@ -841,6 +843,7 @@ const StoryForm = ({ token, user }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
+    setLoading(true);
     if (!file) {
       if (!checkingVideo) setError("Pilih foto atau video untuk story.");
       return;
