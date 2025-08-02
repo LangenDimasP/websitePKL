@@ -1,5 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
 
 export default function LoginPage() {
   const [username, setUsername] = useState("");
@@ -8,12 +10,9 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Mock functions untuk demo
-  const user = null;
-  const loginUser = (token) => console.log("Login with token:", token);
-  const router = { replace: (path) => console.log("Navigate to:", path) };
+  const router = useRouter();
+  const { user, loginUser } = useAuth();
 
-  // Redirect jika sudah login
   useEffect(() => {
     if (user) {
       router.replace("/");
@@ -26,9 +25,6 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-      // Simulasi delay untuk demo
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
       const res = await fetch(
         "https://websitepkl-production.up.railway.app/api/auth/login",
         {
@@ -41,10 +37,11 @@ export default function LoginPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.message);
+        setError(data.message || "Username atau password salah.");
       } else {
         localStorage.setItem("token", data.token);
-        loginUser(data.token);
+        await loginUser(data.token);
+        router.replace("/");
       }
     } catch (err) {
       setError("Terjadi kesalahan saat login. Silakan coba lagi.");
@@ -67,7 +64,7 @@ export default function LoginPage() {
             Selamat Datang
           </h1>
           <p className="text-gray-600 text-sm sm:text-base">
-            Masuk ke akun PKL Porto Anda
+            Masuk ke akun PKL Anda
           </p>
         </div>
 
@@ -194,9 +191,7 @@ export default function LoginPage() {
               )}
             </button>
           </form>
-
         </div>
-
       </div>
     </div>
   );
