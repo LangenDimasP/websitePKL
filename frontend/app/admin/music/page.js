@@ -1,4 +1,3 @@
-// File: frontend/app/admin/music/page.js (Buat folder & file baru ini)
 "use client";
 
 import { useState } from "react";
@@ -13,6 +12,7 @@ export default function UploadMusicPage() {
   const [audioFile, setAudioFile] = useState(null);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false); // Tambahkan state loading
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -22,6 +22,8 @@ export default function UploadMusicPage() {
       setError("Semua kolom wajib diisi.");
       return;
     }
+
+    setIsLoading(true); // Mulai loading
 
     const formData = new FormData();
     formData.append("title", title);
@@ -37,14 +39,15 @@ export default function UploadMusicPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.message);
       setMessage("Lagu berhasil diunggah!");
-      // Kosongkan form
       setTitle("");
       setArtist("");
       e.target.reset();
     } catch (err) {
       setError(err.message);
     }
+    setIsLoading(false); // Selesai loading
   };
+
   if (!user || user.role !== "admin") {
     return (
       <div className="container mx-auto max-w-lg py-10 text-center">
@@ -56,7 +59,6 @@ export default function UploadMusicPage() {
     );
   }
 
-  // Tampilkan form hanya jika pengguna adalah admin
   return (
     <div className="container mx-auto max-w-lg py-10">
       <h1 className="text-3xl font-bold mb-6">Unggah Lagu Baru</h1>
@@ -99,8 +101,9 @@ export default function UploadMusicPage() {
         <button
           type="submit"
           className="w-full bg-blue-500 text-white py-2 rounded"
+          disabled={isLoading}
         >
-          Unggah
+          {isLoading ? "Memproses..." : "Unggah"}
         </button>
       </form>
     </div>
