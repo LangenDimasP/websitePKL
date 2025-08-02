@@ -4,7 +4,7 @@
 import { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 
-const API_URL = "websitepkl-production.up.railway.app";
+const API_URL = "https://websitepkl-production.up.railway.app";
 
 export default function UploadMusicPage() {
   const { user, token, loading } = useAuth();

@@ -7,7 +7,7 @@ import Cropper from "react-cropper";
 import "cropperjs/dist/cropper.css";
 import { XMarkIcon } from "@heroicons/react/24/solid";
 
-const API_URL = "websitepkl-production.up.railway.app";
+const API_URL = "https://websitepkl-production.up.railway.app";
 
 export default function EditProfilePage() {
   const { user, token, loading } = useAuth();

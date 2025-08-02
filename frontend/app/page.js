@@ -12,7 +12,7 @@ import {
 } from "@heroicons/react/24/solid";
 
 
-const API_URL = "websitepkl-production.up.railway.app";
+const API_URL = "https://websitepkl-production.up.railway.app";
 
 const PostGridItem = ({ post, onPostClick }) => (
   <div

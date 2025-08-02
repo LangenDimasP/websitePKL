@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import PostModal from "@/components/PostModal";
 import { useAuth } from "@/context/AuthContext";
 
-const API_URL = "websitepkl-production.up.railway.app";
+const API_URL = "https://websitepkl-production.up.railway.app";
 
 export default function SharedPost() {
   const { slug } = useParams();

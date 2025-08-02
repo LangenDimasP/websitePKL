@@ -18,7 +18,7 @@ import {
 
 // ...existing code...
 
-const API_URL = "websitepkl-production.up.railway.app";
+const API_URL = "https://websitepkl-production.up.railway.app";
 
 // --- Komponen Form untuk Postingan ---
 const PostForm = ({ token, user }) => {

@@ -3,7 +3,7 @@
 import { createContext, useState, useEffect, useContext } from "react";
 import { jwtDecode } from "jwt-decode";
 
-const API_URL = "websitepkl-production.up.railway.app";
+const API_URL = "https://websitepkl-production.up.railway.app";
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
