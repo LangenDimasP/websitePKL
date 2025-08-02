@@ -958,7 +958,7 @@ export default function ProfilePage() {
                       <div className="max-w-xs mx-auto">
                         <TagIcon className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-4 text-gray-300" />
                         <p className="text-sm sm:text-base mb-2">
-                          Belum ada postingan yang menanda
+                          Belum ada postingan yang menandai
                         </p>
                         <p className="text-xs sm:text-sm text-gray-400">
                           Postingan yang menandai Anda akan muncul di sini
