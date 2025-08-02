@@ -701,7 +701,7 @@ export default function ProfilePage() {
         {/* Header Profile */}
         <header className="flex flex-col sm:flex-row items-start sm:items-center p-3 sm:p-4 md:p-8 space-y-4 sm:space-y-0 sm:space-x-4 md:space-x-10">
           {/* Profile Picture */}
-          <div className="w-20 h-20 sm:w-24 sm:h-24 md:w-32 md:h-32 lg:w-40 lg:h-40 flex-shrink-0 mx-auto sm:mx-0">
+          <div className="w-20 h-20 sm:w-24 sm:h-24 md:w-32 md:h-32 lg:w-40 lg:h-40 flex-shrink-0 mx-auto sm:mx-0 sm:mr-4">
             <div
               onClick={() => {
                 if (userStory) {
