@@ -1366,6 +1366,7 @@ export default function ProfilePage() {
                   src={`${API_URL}${userStory.song.url}`}
                   startTime={userStory.song.start_time}
                   endTime={userStory.song.end_time}
+                  setMediaLoaded={setMediaLoaded} // Tambahkan prop ini
                 />
               </div>
             ) : (
@@ -1441,7 +1442,7 @@ function StoryAudioPlayer({ audioRef, src, startTime, endTime }) {
         muted={muted}
         autoPlay
         className="hidden story-audio"
-        onCanPlayThrough={() => setMediaLoaded(true)}
+        onCanPlayThrough={() => setMediaLoaded && setMediaLoaded(true)}
       />
     </div>
   );
