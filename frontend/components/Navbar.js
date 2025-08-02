@@ -234,39 +234,33 @@ export default function Navbar() {
 
             {/* Bottom Navigation untuk Mobile (hanya tampil jika user login) */}
             {user && (
-        <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50">
-            <div className="flex items-center justify-around py-2">
+               <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50">
+            <div className="flex items-center justify-around py-1"> {/* Ubah py-2 jadi py-1 */}
                 {/* Beranda */}
                 <Link
                     href="/"
-                    className={`flex flex-col items-center p-2 transition-colors ${
-                        pathname === "/" ? "text-blue-500" : "text-gray-600 hover:text-blue-500"
-                    }`}
+                    className={`flex flex-col items-center p-1 transition-colors ${pathname === "/" ? "text-blue-500" : "text-gray-600 hover:text-blue-500"}`} // p-2 jadi p-1
                 >
-                    <HomeIcon className={`h-6 w-6 ${pathname === "/" ? "text-blue-500" : ""}`} />
-                    <span className={`text-xs mt-1 ${pathname === "/" ? "text-blue-500 font-bold" : ""}`}>Beranda</span>
+                    <HomeIcon className={`h-5 w-5 ${pathname === "/" ? "text-blue-500" : ""}`} /> {/* h-6 w-6 jadi h-5 w-5 */}
+                    <span className={`text-[10px] mt-0.5 ${pathname === "/" ? "text-blue-500 font-bold" : ""}`}>Beranda</span> {/* text-xs jadi text-[10px], mt-1 jadi mt-0.5 */}
                 </Link>
-
+        
                 {/* Buat Postingan */}
                 <Link
                     href="/create"
-                    className={`flex flex-col items-center p-2 transition-colors ${
-                        pathname === "/create" ? "text-blue-500" : "text-gray-600 hover:text-blue-500"
-                    }`}
+                    className={`flex flex-col items-center p-1 transition-colors ${pathname === "/create" ? "text-blue-500" : "text-gray-600 hover:text-blue-500"}`}
                 >
-                    <PlusCircleIcon className={`h-6 w-6 ${pathname === "/create" ? "text-blue-500" : ""}`} />
-                    <span className={`text-xs mt-1 ${pathname === "/create" ? "text-blue-500 font-bold" : ""}`}>Buat</span>
+                    <PlusCircleIcon className={`h-5 w-5 ${pathname === "/create" ? "text-blue-500" : ""}`} />
+                    <span className={`text-[10px] mt-0.5 ${pathname === "/create" ? "text-blue-500 font-bold" : ""}`}>Buat</span>
                 </Link>
-
+        
                 {/* Profil Saya */}
                 <Link
                     href={`/profil/${user.username}`}
-                    className={`flex flex-col items-center p-2 transition-colors ${
-                        pathname === `/profil/${user.username}` ? "text-blue-500" : "text-gray-600 hover:text-blue-500"
-                    }`}
+                    className={`flex flex-col items-center p-1 transition-colors ${pathname === `/profil/${user.username}` ? "text-blue-500" : "text-gray-600 hover:text-blue-500"}`}
                 >
-                    <UserIcon className={`h-6 w-6 ${pathname === `/profil/${user.username}` ? "text-blue-500" : ""}`} />
-                    <span className={`text-xs mt-1 ${pathname === `/profil/${user.username}` ? "text-blue-500 font-bold" : ""}`}>Profil</span>
+                    <UserIcon className={`h-5 w-5 ${pathname === `/profil/${user.username}` ? "text-blue-500" : ""}`} />
+                    <span className={`text-[10px] mt-0.5 ${pathname === `/profil/${user.username}` ? "text-blue-500 font-bold" : ""}`}>Profil</span>
                 </Link>
             </div>
         </div>
