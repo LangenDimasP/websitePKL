@@ -430,10 +430,17 @@ router.delete('/:id', protect, async (req, res) => {
 
         await connection.query('DELETE FROM likes WHERE post_id = ?', [postId]);
         await connection.query('DELETE FROM mentions WHERE post_id = ?', [postId]);
-        await connection.query('DELETE FROM comments WHERE parent_comment_id IN (SELECT id FROM comments WHERE post_id = ?)', [postId]);
+
+        // --- Perbaikan hapus komentar child ---
+        const [parentComments] = await connection.query('SELECT id FROM comments WHERE post_id = ?', [postId]);
+        const parentCommentIds = parentComments.map(row => row.id);
+        if (parentCommentIds.length > 0) {
+            await connection.query('DELETE FROM comments WHERE parent_comment_id IN (?)', [parentCommentIds]);
+        }
+        // --------------------------------------
+
         await connection.query('DELETE FROM comments WHERE post_id = ?', [postId]);
         await connection.query('DELETE FROM post_media WHERE post_id = ?', [postId]);
-        
         await connection.query('DELETE FROM posts WHERE id = ?', [postId]);
 
         await connection.commit();
