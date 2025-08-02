@@ -54,8 +54,7 @@ app.listen(PORT, '0.0.0.0', async () => {
         console.log('✅ Database connected!');
     } catch (error) {
         console.error('❌ Could not connect to the database.', error);
-        // SARAN: Hentikan aplikasi jika database gagal terhubung
-        process.exit(1); 
+        // SARAN: Hentikan aplikasi jika database gagal terhubung 
     }
     console.log(`🚀 Server is running on http://localhost:${PORT}`);
 });
