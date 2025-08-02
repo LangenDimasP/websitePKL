@@ -3,6 +3,7 @@ const express = require('express');
 const router = express.Router();
 const dbPool = require('../db');
 const { protect, optionalAuth } = require('../middleware/authMiddleware');
+const bcrypt = require('bcrypt');
 
 // Konfigurasi Multer untuk upload foto profil
 const multer = require('multer');
