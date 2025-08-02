@@ -129,7 +129,7 @@ export default function EditProfilePage() {
     setError(null);
     setSuccess(null);
     setIsSubmitting(true);
-
+  
     if (
       passwordData.newPassword &&
       passwordData.newPassword !== passwordData.confirmPassword
@@ -138,27 +138,28 @@ export default function EditProfilePage() {
       setIsSubmitting(false);
       return;
     }
-
+  
+    const dataToSend = new FormData(); // <-- pindahkan ke atas
+    let updatedFields = [];
+  
     if (isProfilePictureChanged) {
       const response = await fetch(currentPictureUrl);
       const blob = await response.blob();
       dataToSend.append("profilePicture", blob, "profile.jpeg");
       updatedFields.push("Foto Profil");
     }
-
-    const dataToSend = new FormData();
+  
     dataToSend.append("username", formData.username);
     dataToSend.append("fullName", formData.fullName);
     dataToSend.append("bio", formData.bio);
     dataToSend.append("school", formData.school);
-
+  
     if (passwordData.newPassword) {
       dataToSend.append("currentPassword", passwordData.currentPassword);
       dataToSend.append("newPassword", passwordData.newPassword);
+      updatedFields.push("Password");
     }
-
-    let updatedFields = [];
-
+  
     if (oldFormData) {
       if (formData.username !== oldFormData.username)
         updatedFields.push("Username");
@@ -168,11 +169,7 @@ export default function EditProfilePage() {
       if (formData.school !== oldFormData.school)
         updatedFields.push("Asal Sekolah");
     }
-
-    if (passwordData.newPassword) {
-      updatedFields.push("Password");
-    }
-
+  
     try {
       const res = await fetch(`${API_URL}/api/users/profile/update`, {
         method: "PUT",
@@ -182,7 +179,7 @@ export default function EditProfilePage() {
       const result = await res.json();
       if (!res.ok)
         throw new Error(result.message || "Gagal memperbarui profil.");
-
+  
       let successMsg = "";
       if (updatedFields.length === 0) {
         successMsg = "Tidak ada perubahan pada profil.";
@@ -192,7 +189,7 @@ export default function EditProfilePage() {
           .join(", ");
       }
       setSuccess(successMsg);
-
+  
       setTimeout(() => {
         router.push(`/profil/${formData.username}`);
         router.refresh();
