@@ -42,6 +42,7 @@ const PostForm = ({ token, user }) => {
   const cropperRefs = useRef([]);
   const captionRef = useRef(null);
   const audioRef = useRef(null);
+  const [loading, setLoading] = useState(false);
 
   // Fetch songs when component mounts
   useEffect(() => {
@@ -253,13 +254,13 @@ const PostForm = ({ token, user }) => {
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Gagal membuat postingan");
       setSuccessMsg("Postingan berhasil dibuat!");
-      setTimeout(() => {
-        router.push(`/profil/${user.username}`);
-      }, 1200);
-      if (!res.ok) throw new Error(data.message || "Gagal membuat postingan");
+    setLoading(false);
+    setTimeout(() => {
       router.push(`/profil/${user.username}`);
-    } catch (err) {
-      setError(err.message);
+    }, 1200);
+  } catch (err) {
+    setError(err.message);
+    setLoading(false);
     }
   };
 
@@ -298,7 +299,7 @@ const PostForm = ({ token, user }) => {
   let imageIndex = -1;
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-6 pb-12">
       {error && (
         <p className="text-sm text-red-600 bg-red-100 p-3 rounded-lg">
           {error}
@@ -631,9 +632,10 @@ const PostForm = ({ token, user }) => {
 
       <button
         type="submit"
-        className="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg text-sm sm:text-base touch-manipulation"
+        className={`w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg text-sm sm:text-base touch-manipulation ${loading ? "opacity-60 cursor-not-allowed" : ""}`}
+        disabled={loading}
       >
-        Publikasikan Postingan
+        {loading ? "Memproses..." : "Publikasikan Postingan"}
       </button>
     </form>
   );
@@ -645,6 +647,7 @@ const NoteForm = ({ token, user }) => {
   const [content, setContent] = useState("");
   const [error, setError] = useState(null);
   const [successMsg, setSuccessMsg] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -666,16 +669,18 @@ const NoteForm = ({ token, user }) => {
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Gagal membuat catatan");
       setSuccessMsg("Catatan berhasil dibuat!");
-      setTimeout(() => {
-        router.push(`/profil/${user.username}`);
-      }, 1200);
-    } catch (err) {
-      setError(err.message);
-    }
+      setLoading(false);
+    setTimeout(() => {
+      router.push(`/profil/${user.username}`);
+    }, 1200);
+  } catch (err) {
+    setError(err.message);
+    setLoading(false);
+  }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-6 pb-12">
       {error && (
         <p className="text-sm text-red-600 bg-red-100 p-3 rounded-lg">
           {error}
@@ -704,9 +709,10 @@ const NoteForm = ({ token, user }) => {
       </div>
       <button
         type="submit"
-        className="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg text-sm sm:text-base touch-manipulation"
+        className={`w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg text-sm sm:text-base touch-manipulation ${loading ? "opacity-60 cursor-not-allowed" : ""}`}
+        disabled={loading}
       >
-        Publikasikan Catatan
+        {loading ? "Memproses..." : "Publikasikan Catatan"}
       </button>
     </form>
   );
@@ -731,6 +737,7 @@ const StoryForm = ({ token, user }) => {
   const [videoDuration, setVideoDuration] = useState(0);
   const videoRef = useRef(null);
   const [checkingVideo, setCheckingVideo] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (!token) return;
@@ -853,14 +860,18 @@ const StoryForm = ({ token, user }) => {
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Gagal upload story");
       setSuccessMsg("Story berhasil diupload!");
-      setTimeout(() => router.push(`/profil/${user.username}`), 1200);
-    } catch (err) {
-      setError(err.message);
-    }
+      setLoading(false);
+    setTimeout(() => {
+      router.push(`/profil/${user.username}`);
+    }, 1200);
+  } catch (err) {
+    setError(err.message);
+    setLoading(false);
+  }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-6 pb-12">
       {error && (
         <p className="text-sm text-red-600 bg-red-100 p-3 rounded-lg">
           {error}
@@ -1044,10 +1055,10 @@ const StoryForm = ({ token, user }) => {
       </div>
       <button
         type="submit"
-        className="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg text-sm"
-        disabled={!file || checkingVideo}
+        className={`w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg text-sm ${loading ? "opacity-60 cursor-not-allowed" : ""}`}
+        disabled={loading || !file || checkingVideo}
       >
-        Publikasikan Story
+        {loading ? "Memproses..." : "Publikasikan Story"}
       </button>
     </form>
   );
