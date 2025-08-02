@@ -711,7 +711,7 @@ export default function ProfilePage() {
                   setIsProfileImageModalOpen(true);
                 }
               }}
-              className={`w-full h-full rounded-full cursor-pointer relative ${
+              className={`w-full h-full rounded-full cursor-pointer relative mr-3${
                 userStory
                   ? hasSeenStory
                     ? "p-1 bg-gray-200" // outline abu-abu muda jika sudah dilihat
@@ -720,7 +720,7 @@ export default function ProfilePage() {
               }`}
             >
               <div
-                className={`w-full h-full rounded-full ${
+                className={`w-full h-full rounded-full mr-3 ${
                   userStory ? "p-0.5 bg-white" : ""
                 }`}
               >
