@@ -555,13 +555,14 @@ useEffect(() => {
             return;
         }
     
+        // Update state lokal langsung
+        const newIsLiked = !isLiked;
+        const newLikeCount = isLiked ? likeCount - 1 : likeCount + 1;
+    
+        setIsLiked(newIsLiked);
+        setLikeCount(newLikeCount);
+    
         try {
-            const newIsLiked = !isLiked;
-            const newLikeCount = isLiked ? likeCount - 1 : likeCount + 1;
-    
-            setIsLiked(newIsLiked);
-            setLikeCount(newLikeCount);
-    
             if (loggedInUser) {
                 const res = await fetch(`${API_URL}/api/posts/${post.id}/like`, {
                     method: 'POST',
@@ -577,10 +578,13 @@ useEffect(() => {
     
                 const data = await res.json();
                 if (!res.ok) {
+                    // Jika gagal, rollback state
+                    setIsLiked(isLiked);
+                    setLikeCount(likeCount);
                     throw new Error(data.message || 'Gagal toggle like');
                 }
     
-                // Kirim seluruh data post terbaru ke parent
+                // Update parent jika perlu
                 if (typeof onUpdatePost === 'function') {
                     onUpdatePost({
                         ...post,
@@ -589,12 +593,12 @@ useEffect(() => {
                     });
                 }
             } else {
+                // Guest like
                 if (newIsLiked) {
                     addGuestLike(post.id);
                 } else {
                     removeGuestLike(post.id);
                 }
-                // Kirim seluruh data post terbaru ke parent
                 if (typeof onUpdatePost === 'function') {
                     onUpdatePost({
                         ...post,
@@ -604,6 +608,7 @@ useEffect(() => {
                 }
             }
         } catch (error) {
+            // Rollback state jika error
             setIsLiked(isLiked);
             setLikeCount(likeCount);
             console.error('Error toggling like:', error);
