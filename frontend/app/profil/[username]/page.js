@@ -175,6 +175,7 @@ export default function ProfilePage() {
   const [activeTab, setActiveTab] = useState("posts");
   const [deletingNoteId, setDeletingNoteId] = useState(null);
   const [hasSeenStory, setHasSeenStory] = useState(false);
+    const [mediaLoaded, setMediaLoaded] = useState(false);
   const [followListModal, setFollowListModal] = useState({
     isOpen: false,
     title: "",
@@ -259,43 +260,38 @@ export default function ProfilePage() {
   };
 
   useEffect(() => {
-    if (isStoryModalOpen) {
-      document.body.style.overflow = "hidden";
+    if (isStoryModalOpen && mediaLoaded) {
       setTimeLeft(15000);
-      startTimeRef.current = Date.now(); // Reset waktu mulai
+      startTimeRef.current = Date.now();
       setIsPlaying(true);
-
-      // Reset dan jalankan animasi progress bar
+  
       if (progressBarRef.current) {
         progressBarRef.current.style.animation = "none";
-        void progressBarRef.current.offsetWidth; // Trigger reflow
+        void progressBarRef.current.offsetWidth;
         progressBarRef.current.style.animation = "progress 15s linear forwards";
       }
-
+  
       updateTimer();
     } else {
-      document.body.style.overflow = "";
       setTimeLeft(15000);
       startTimeRef.current = null;
       setIsPlaying(false);
-
+  
       if (timerRef.current) {
         cancelAnimationFrame(timerRef.current);
       }
-
-      // Reset audio jika ada
-      if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current.currentTime = userStory?.song?.start_time || 0;
-      }
     }
-
     return () => {
-      document.body.style.overflow = "";
       if (timerRef.current) {
         cancelAnimationFrame(timerRef.current);
       }
     };
+  }, [isStoryModalOpen, userStory, mediaLoaded]);
+
+    useEffect(() => {
+    if (isStoryModalOpen) {
+      setMediaLoaded(false);
+    }
   }, [isStoryModalOpen, userStory]);
 
   // Perbaiki event handler untuk media container
@@ -1319,9 +1315,10 @@ export default function ProfilePage() {
                 {userStory.media_type === "image" ? (
                   <img
                     src={`${API_URL}${userStory.media_url}`}
-                    alt="Story"
-                    className="w-full h-full object-contain"
-                    draggable={false}
+  alt="Story"
+  className="w-full h-full object-contain"
+  draggable={false}
+  onLoad={() => setMediaLoaded(true)}
                     onDragStart={(e) => e.preventDefault()}
                     style={{
                       userSelect: "none",
@@ -1332,13 +1329,14 @@ export default function ProfilePage() {
                 ) : (
                   <>
                     <video
-                      ref={videoStoryRef}
-                      src={`${API_URL}${userStory.media_url}`}
-                      autoPlay
-                      controls={false}
-                      muted={false}
-                      className="w-full h-full object-contain"
-                      draggable={false}
+  ref={videoStoryRef}
+  src={`${API_URL}${userStory.media_url}`}
+  autoPlay
+  controls={false}
+  muted={false}
+  className="w-full h-full object-contain"
+  draggable={false}
+  onLoadedData={() => setMediaLoaded(true)}
                       onDragStart={(e) => e.preventDefault()}
                       style={{
                         userSelect: "none",
@@ -1443,6 +1441,7 @@ function StoryAudioPlayer({ audioRef, src, startTime, endTime }) {
         muted={muted}
         autoPlay
         className="hidden story-audio"
+        onCanPlayThrough={() => setMediaLoaded(true)}
       />
     </div>
   );
