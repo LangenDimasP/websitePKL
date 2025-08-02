@@ -332,6 +332,8 @@ export default function PostModal({ post, user, onClose, onUpdatePost, onPostDel
     const [showModal, setShowModal] = useState(false);
     const [showLoginCommentPopup, setShowLoginCommentPopup] = useState(false);
         const [isMuted, setIsMuted] = useState(false);
+const [isCaptionExpanded, setIsCaptionExpanded] = useState(false);
+const CAPTION_MAX_LENGTH = 180; // Atur batas karakter sesuai kebutuhan
 
 
         useEffect(() => {
@@ -541,6 +543,29 @@ useEffect(() => {
         };
         fetchComments();
     }, [post.id]);
+
+        function renderCaption(caption) {
+      if (!caption) return null;
+      if (isCaptionExpanded || caption.length <= CAPTION_MAX_LENGTH) {
+        return (
+          <span>
+            <RenderWithLinks text={caption} />
+          </span>
+        );
+      }
+      return (
+        <span>
+          <RenderWithLinks text={caption.slice(0, CAPTION_MAX_LENGTH) + '...'} />{' '}
+          <button
+            className="text-blue-500 hover:underline text-xs font-semibold"
+            onClick={() => setIsCaptionExpanded(true)}
+            type="button"
+          >
+            baca selengkapnya
+          </button>
+        </span>
+      );
+    }
 
     useEffect(() => {
       if (post && post.id) {
@@ -888,7 +913,7 @@ const confirmDelete = async () => {
                                     <img src="/verified-badge.webp" alt="Verified" className="w-3 h-3 sm:w-4 sm:h-4 ml-1" />
                                 )}
                             </span>{' '}
-                            <RenderWithLinks text={post.caption} />
+                            {renderCaption(post.caption)}
                         </div>
                     </div>
                     
