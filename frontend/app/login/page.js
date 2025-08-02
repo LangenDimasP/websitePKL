@@ -23,7 +23,7 @@ export default function LoginPage() {
     e.preventDefault();
     setError(null);
 
-    const res = await fetch("https://arsipklrpl4025.my.id/backend/api/auth/login", {
+    const res = await fetch("websitepkl-production.up.railway.app/api/auth/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ username, password }),

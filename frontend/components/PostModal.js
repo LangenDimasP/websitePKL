@@ -30,7 +30,7 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 
-const API_URL = "https://arsipklrpl4025.my.id/backend";
+const API_URL = "websitepkl-production.up.railway.app";
 
 // --- Fungsi Helper ---
 const getGuestLikes = () => { 

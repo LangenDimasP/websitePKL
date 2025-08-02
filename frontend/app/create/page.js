@@ -18,7 +18,7 @@ import {
 
 // ...existing code...
 
-const API_URL = "https://arsipklrpl4025.my.id/backend";
+const API_URL = "websitepkl-production.up.railway.app";
 
 // --- Komponen Form untuk Postingan ---
 const PostForm = ({ token, user }) => {
@@ -45,31 +45,31 @@ const PostForm = ({ token, user }) => {
 
   // Fetch songs when component mounts
   useEffect(() => {
-  const fetchSongs = async () => {
-    try {
-      const res = await fetch(`${API_URL}/api/songs`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      
-      // Periksa apakah response berhasil
-      if (!res.ok) {
-        throw new Error(`HTTP error! status: ${res.status}`);
+    const fetchSongs = async () => {
+      try {
+        const res = await fetch(`${API_URL}/api/songs`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        // Periksa apakah response berhasil
+        if (!res.ok) {
+          throw new Error(`HTTP error! status: ${res.status}`);
+        }
+
+        const data = await res.json();
+        setSongs(data);
+      } catch (err) {
+        console.error("Gagal memuat daftar lagu:", err);
+        // Set songs ke array kosong jika gagal fetch
+        setSongs([]);
       }
-      
-      const data = await res.json();
-      setSongs(data);
-    } catch (err) {
-      console.error("Gagal memuat daftar lagu:", err);
-      // Set songs ke array kosong jika gagal fetch
-      setSongs([]);
+    };
+
+    // Hanya fetch jika token tersedia
+    if (token) {
+      fetchSongs();
     }
-  };
-  
-  // Hanya fetch jika token tersedia
-  if (token) {
-    fetchSongs();
-  }
-}, [token]);
+  }, [token]);
 
   // Cleanup audio and revoke object URLs
   useEffect(() => {
@@ -168,39 +168,39 @@ const PostForm = ({ token, user }) => {
     }
   };
 
-const togglePlayPause = () => {
+  const togglePlayPause = () => {
     const audio = audioRef.current;
     if (!audio) return;
 
     if (isMusicPlaying) {
-        audio.pause();
-        setIsMusicPlaying(false);
+      audio.pause();
+      setIsMusicPlaying(false);
     } else {
-        audio.currentTime = songStartTime;
-        audio.play().catch(() => {});
-        setIsMusicPlaying(true);
+      audio.currentTime = songStartTime;
+      audio.play().catch(() => {});
+      setIsMusicPlaying(true);
     }
-};
+  };
 
-useEffect(() => {
+  useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
 
     const handleTimeUpdate = () => {
-        if (audio.currentTime >= songEndTime) {
-            audio.pause();
-            setIsMusicPlaying(false);
-        }
+      if (audio.currentTime >= songEndTime) {
+        audio.pause();
+        setIsMusicPlaying(false);
+      }
     };
 
     if (isMusicPlaying) {
-        audio.addEventListener('timeupdate', handleTimeUpdate);
+      audio.addEventListener("timeupdate", handleTimeUpdate);
     }
 
     return () => {
-        audio.removeEventListener('timeupdate', handleTimeUpdate);
+      audio.removeEventListener("timeupdate", handleTimeUpdate);
     };
-}, [isMusicPlaying, songEndTime]);
+  }, [isMusicPlaying, songEndTime]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -712,8 +712,6 @@ const NoteForm = ({ token, user }) => {
   );
 };
 
-
-
 // Tambahkan di atas export default function CreatePostPage()
 // ...existing code...
 const StoryForm = ({ token, user }) => {
@@ -735,28 +733,28 @@ const StoryForm = ({ token, user }) => {
   const [checkingVideo, setCheckingVideo] = useState(false);
 
   useEffect(() => {
-  if (!token) return;
-  
-  const fetchSongs = async () => {
-    try {
-      const res = await fetch(`${API_URL}/api/songs`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      
-      if (!res.ok) {
-        throw new Error(`HTTP error! status: ${res.status}`);
+    if (!token) return;
+
+    const fetchSongs = async () => {
+      try {
+        const res = await fetch(`${API_URL}/api/songs`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (!res.ok) {
+          throw new Error(`HTTP error! status: ${res.status}`);
+        }
+
+        const data = await res.json();
+        setSongs(data);
+      } catch (err) {
+        console.error("Gagal memuat daftar lagu:", err);
+        setSongs([]);
       }
-      
-      const data = await res.json();
-      setSongs(data);
-    } catch (err) {
-      console.error("Gagal memuat daftar lagu:", err);
-      setSongs([]);
-    }
-  };
-  
-  fetchSongs();
-}, [token]);
+    };
+
+    fetchSongs();
+  }, [token]);
 
   const handleFileChange = (e) => {
     const selected = e.target.files[0];
@@ -810,7 +808,6 @@ const StoryForm = ({ token, user }) => {
     }
   };
 
-
   useEffect(() => {
     if (videoRef.current && file && file.type.startsWith("video/")) {
       videoRef.current.currentTime = videoStart;
@@ -827,27 +824,27 @@ const StoryForm = ({ token, user }) => {
       }
     };
     if (isMusicPlaying) {
-      audio.addEventListener('timeupdate', handleTimeUpdate);
+      audio.addEventListener("timeupdate", handleTimeUpdate);
     }
     return () => {
-      audio.removeEventListener('timeupdate', handleTimeUpdate);
+      audio.removeEventListener("timeupdate", handleTimeUpdate);
     };
   }, [isMusicPlaying, songEndTime]);
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
-  setError(null);
-  if (!file) {
-    if (!checkingVideo) setError("Pilih foto atau video untuk story.");
-    return;
-  }
-  try {
-    const formData = new FormData();
-    formData.append("media", file);
-    if (file.type.startsWith("video/")) {
-      formData.append("videoStart", videoStart);
-      formData.append("videoEnd", videoEnd);
+    e.preventDefault();
+    setError(null);
+    if (!file) {
+      if (!checkingVideo) setError("Pilih foto atau video untuk story.");
+      return;
     }
+    try {
+      const formData = new FormData();
+      formData.append("media", file);
+      if (file.type.startsWith("video/")) {
+        formData.append("videoStart", videoStart);
+        formData.append("videoEnd", videoEnd);
+      }
       const res = await fetch(`${API_URL}/api/stories`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
@@ -864,10 +861,21 @@ const StoryForm = ({ token, user }) => {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      {error && <p className="text-sm text-red-600 bg-red-100 p-3 rounded-lg">{error}</p>}
-      {successMsg && <p className="text-sm text-green-600 bg-green-100 p-3 rounded-lg">{successMsg}</p>}
+      {error && (
+        <p className="text-sm text-red-600 bg-red-100 p-3 rounded-lg">
+          {error}
+        </p>
+      )}
+      {successMsg && (
+        <p className="text-sm text-green-600 bg-green-100 p-3 rounded-lg">
+          {successMsg}
+        </p>
+      )}
       <div>
-        <label htmlFor="file" className="block text-gray-700 text-sm font-bold mb-2">
+        <label
+          htmlFor="file"
+          className="block text-gray-700 text-sm font-bold mb-2"
+        >
           Pilih Foto/Video (maksimal 15 detik)
         </label>
         <input
@@ -903,13 +911,16 @@ const StoryForm = ({ token, user }) => {
                   objectFit: "contain",
                 }}
                 className="rounded-lg border"
-                onLoadedMetadata={e => {
+                onLoadedMetadata={(e) => {
                   setVideoDuration(e.target.duration);
-                  if (videoEnd === 0) setVideoEnd(Math.min(15, e.target.duration));
+                  if (videoEnd === 0)
+                    setVideoEnd(Math.min(15, e.target.duration));
                 }}
               />
               <div className="w-full mt-2">
-                <label className="text-xs text-gray-500">Pilih bagian video (max 15 detik)</label>
+                <label className="text-xs text-gray-500">
+                  Pilih bagian video (max 15 detik)
+                </label>
                 <div className="flex items-center gap-2">
                   <span className="text-xs">{Math.floor(videoStart)}s</span>
                   <input
@@ -917,7 +928,7 @@ const StoryForm = ({ token, user }) => {
                     min={0}
                     max={videoDuration - 1}
                     value={videoStart}
-                    onChange={e => {
+                    onChange={(e) => {
                       const val = parseFloat(e.target.value);
                       setVideoStart(val);
                       setVideoEnd(Math.min(val + 15, videoDuration));
@@ -930,7 +941,7 @@ const StoryForm = ({ token, user }) => {
                     min={0}
                     max={videoDuration - 1}
                     value={videoStart}
-                    onChange={e => {
+                    onChange={(e) => {
                       const val = parseFloat(e.target.value);
                       setVideoStart(val);
                       setVideoEnd(Math.min(val + 15, videoDuration));
@@ -992,15 +1003,13 @@ const StoryForm = ({ token, user }) => {
               </button>
               <div className="flex-1 space-y-2">
                 <div>
-                  <label className="text-xs text-gray-500">
-                    Mulai dari
-                  </label>
+                  <label className="text-xs text-gray-500">Mulai dari</label>
                   <input
                     type="range"
                     min={0}
                     max={videoDuration - 1}
                     value={videoStart}
-                    onChange={e => {
+                    onChange={(e) => {
                       const val = parseFloat(e.target.value);
                       setVideoStart(val);
                       setVideoEnd(Math.min(val + 15, videoDuration));
@@ -1009,15 +1018,13 @@ const StoryForm = ({ token, user }) => {
                   />
                 </div>
                 <div>
-                  <label className="text-xs text-gray-500">
-                    Berhenti di
-                  </label>
+                  <label className="text-xs text-gray-500">Berhenti di</label>
                   <input
                     type="range"
                     min={0}
                     max={videoDuration - 1}
                     value={videoStart}
-                    onChange={e => {
+                    onChange={(e) => {
                       const val = parseFloat(e.target.value);
                       setVideoStart(val);
                       setVideoEnd(Math.min(val + 15, videoDuration));
@@ -1119,7 +1126,6 @@ export default function CreatePostPage() {
     </div>
   );
 }
-
 
 // --- Custom CSS for Toggle Switch and Range Input ---
 const styles = `

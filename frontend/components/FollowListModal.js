@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { XMarkIcon } from "@heroicons/react/24/solid";
 
-const API_URL = "https://arsipklrpl4025.my.id/backend";
+const API_URL = "websitepkl-production.up.railway.app";
 
 export default function FollowListModal({ title, users, onClose }) {
   return (

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react"; 
+import { useState, useEffect, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
@@ -20,7 +20,7 @@ import {
   SpeakerXMarkIcon,
 } from "@heroicons/react/24/solid";
 
-const API_URL = "https://arsipklrpl4025.my.id/backend";
+const API_URL = "websitepkl-production.up.railway.app";
 
 // --- Fungsi Pengambilan Data ---
 async function getProfileData(username, token) {
@@ -41,19 +41,19 @@ async function getUserStory(username, token) {
     const res = await fetch(`${API_URL}/api/stories/${username}`, {
       headers: token ? { Authorization: `Bearer ${token}` } : {},
     });
-    
+
     if (!res.ok) {
       console.log("Failed to fetch stories:", res.status);
       return null;
     }
-    
+
     const stories = await res.json();
     console.log("Raw stories response:", stories);
-    
+
     if (stories && stories.length > 0) {
       const story = stories[0];
       console.log("Found story:", story);
-      
+
       // Fetch song data if story has song_id
       if (story.song_id) {
         try {
@@ -64,7 +64,7 @@ async function getUserStory(username, token) {
           const songRes = await fetch(songUrl, {
             headers: token ? { Authorization: `Bearer ${token}` } : {},
           });
-          
+
           if (!songRes.ok) {
             console.error(`Failed to fetch song (${songRes.status}):`, songUrl);
             // Return story without song data if song fetch fails
@@ -75,21 +75,21 @@ async function getUserStory(username, token) {
                 artist: "Unknown",
                 url: null,
                 start_time: story.song_start_time,
-                end_time: story.song_end_time
-              }
+                end_time: story.song_end_time,
+              },
             };
           }
-          
+
           const songData = await songRes.json();
           console.log("Song data:", songData);
-          
+
           return {
             ...story,
             song: {
               ...songData,
               start_time: story.song_start_time,
-              end_time: story.song_end_time
-            }
+              end_time: story.song_end_time,
+            },
           };
         } catch (error) {
           console.error("Error fetching song:", error);
@@ -101,8 +101,8 @@ async function getUserStory(username, token) {
               artist: "Unknown",
               url: null,
               start_time: story.song_start_time,
-              end_time: story.song_end_time
-            }
+              end_time: story.song_end_time,
+            },
           };
         }
       }
@@ -162,7 +162,7 @@ export default function ProfilePage() {
   const [posts, setPosts] = useState([]);
   const [notes, setNotes] = useState([]);
   const [userStories, setUserStories] = useState([]);
-const [activeStoryIndex, setActiveStoryIndex] = useState(0);
+  const [activeStoryIndex, setActiveStoryIndex] = useState(0);
   const [isStoryModalOpen, setIsStoryModalOpen] = useState(false);
   const [taggedPosts, setTaggedPosts] = useState([]);
   const [loadingProfile, setLoadingProfile] = useState(true);
@@ -185,12 +185,11 @@ const [activeStoryIndex, setActiveStoryIndex] = useState(0);
   const userStory = userStories[activeStoryIndex];
 
   const [timeLeft, setTimeLeft] = useState(15000);
-const [isPlaying, setIsPlaying] = useState(true);
-const timerRef = useRef(null);
-const progressBarRef = useRef(null);
-const audioRef = useRef(null);
-const startTimeRef = useRef(null); // Tambahkan ref untuk waktu mulai
-
+  const [isPlaying, setIsPlaying] = useState(true);
+  const timerRef = useRef(null);
+  const progressBarRef = useRef(null);
+  const audioRef = useRef(null);
+  const startTimeRef = useRef(null); // Tambahkan ref untuk waktu mulai
 
   const getRelativeTime = (dateString) => {
     const now = new Date();
@@ -208,126 +207,130 @@ const startTimeRef = useRef(null); // Tambahkan ref untuk waktu mulai
   const router = useRouter();
 
   // Perbaiki fungsi updateTimer
-const updateTimer = () => {
-  if (!startTimeRef.current) {
-    startTimeRef.current = Date.now();
-  }
-
-  const elapsed = Date.now() - startTimeRef.current;
-  const remaining = 15000 - elapsed;
-
-  if (remaining <= 0) {
-    // Jika masih ada story berikutnya, lanjut ke story berikutnya
-    if (activeStoryIndex < userStories.length - 1) {
-      setActiveStoryIndex(i => i + 1);
-      setTimeLeft(15000);
+  const updateTimer = () => {
+    if (!startTimeRef.current) {
       startTimeRef.current = Date.now();
-      // Progress bar akan otomatis reset di useEffect [isStoryModalOpen, userStory]
-      return;
-    } else {
-      // Kalau sudah story terakhir, tutup modal
-      setIsStoryModalOpen(false);
-      return;
     }
-  }
 
-  setTimeLeft(remaining);
-  timerRef.current = requestAnimationFrame(updateTimer);
-};
+    const elapsed = Date.now() - startTimeRef.current;
+    const remaining = 15000 - elapsed;
 
-const markStoryAsSeen = (username) => {
+    if (remaining <= 0) {
+      // Jika masih ada story berikutnya, lanjut ke story berikutnya
+      if (activeStoryIndex < userStories.length - 1) {
+        setActiveStoryIndex((i) => i + 1);
+        setTimeLeft(15000);
+        startTimeRef.current = Date.now();
+        // Progress bar akan otomatis reset di useEffect [isStoryModalOpen, userStory]
+        return;
+      } else {
+        // Kalau sudah story terakhir, tutup modal
+        setIsStoryModalOpen(false);
+        return;
+      }
+    }
+
+    setTimeLeft(remaining);
+    timerRef.current = requestAnimationFrame(updateTimer);
+  };
+
+  const markStoryAsSeen = (username) => {
     let seenStories = JSON.parse(localStorage.getItem("seenStories") || "{}");
     seenStories[username] = true;
     localStorage.setItem("seenStories", JSON.stringify(seenStories));
   };
 
-const pauseTimer = () => {
-  setIsPlaying(false);
-  if (timerRef.current) {
-    cancelAnimationFrame(timerRef.current);
-  }
-  if (progressBarRef.current) {
-    progressBarRef.current.style.animationPlayState = "paused";
-  }
-};
-
-const resumeTimer = () => {
-  setIsPlaying(true);
-  if (progressBarRef.current) {
-    progressBarRef.current.style.animationPlayState = "running";
-  }
-  updateTimer();
-};
-
-useEffect(() => {
-  if (isStoryModalOpen) {
-    document.body.style.overflow = "hidden";
-    setTimeLeft(15000);
-    startTimeRef.current = Date.now(); // Reset waktu mulai
-    setIsPlaying(true);
-    
-    // Reset dan jalankan animasi progress bar
-    if (progressBarRef.current) {
-      progressBarRef.current.style.animation = "none";
-      void progressBarRef.current.offsetWidth; // Trigger reflow
-      progressBarRef.current.style.animation = "progress 15s linear forwards";
-    }
-    
-    updateTimer();
-  } else {
-    document.body.style.overflow = "";
-    setTimeLeft(15000);
-    startTimeRef.current = null;
+  const pauseTimer = () => {
     setIsPlaying(false);
-    
     if (timerRef.current) {
       cancelAnimationFrame(timerRef.current);
     }
-    
-    // Reset audio jika ada
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current.currentTime = userStory?.song?.start_time || 0;
-    }
-  }
-
-  return () => {
-    document.body.style.overflow = "";
-    if (timerRef.current) {
-      cancelAnimationFrame(timerRef.current);
+    if (progressBarRef.current) {
+      progressBarRef.current.style.animationPlayState = "paused";
     }
   };
-}, [isStoryModalOpen, userStory]);
 
-// Perbaiki event handler untuk media container
-const handleMediaClick = (e) => {
-  e.stopPropagation();
-  if (audioRef.current && !e.type.includes("touch")) {
-    if (isPlaying) {
+  const resumeTimer = () => {
+    setIsPlaying(true);
+    if (progressBarRef.current) {
+      progressBarRef.current.style.animationPlayState = "running";
+    }
+    updateTimer();
+  };
+
+  useEffect(() => {
+    if (isStoryModalOpen) {
+      document.body.style.overflow = "hidden";
+      setTimeLeft(15000);
+      startTimeRef.current = Date.now(); // Reset waktu mulai
+      setIsPlaying(true);
+
+      // Reset dan jalankan animasi progress bar
+      if (progressBarRef.current) {
+        progressBarRef.current.style.animation = "none";
+        void progressBarRef.current.offsetWidth; // Trigger reflow
+        progressBarRef.current.style.animation = "progress 15s linear forwards";
+      }
+
+      updateTimer();
+    } else {
+      document.body.style.overflow = "";
+      setTimeLeft(15000);
+      startTimeRef.current = null;
+      setIsPlaying(false);
+
+      if (timerRef.current) {
+        cancelAnimationFrame(timerRef.current);
+      }
+
+      // Reset audio jika ada
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.currentTime = userStory?.song?.start_time || 0;
+      }
+    }
+
+    return () => {
+      document.body.style.overflow = "";
+      if (timerRef.current) {
+        cancelAnimationFrame(timerRef.current);
+      }
+    };
+  }, [isStoryModalOpen, userStory]);
+
+  // Perbaiki event handler untuk media container
+  const handleMediaClick = (e) => {
+    e.stopPropagation();
+    if (audioRef.current && !e.type.includes("touch")) {
+      if (isPlaying) {
+        pauseTimer();
+        audioRef.current.pause();
+      } else {
+        resumeTimer();
+        audioRef.current
+          .play()
+          .catch((err) => console.error("Audio play failed:", err));
+      }
+    }
+  };
+
+  const handleTouchStart = (e) => {
+    e.stopPropagation();
+    if (audioRef.current && isPlaying) {
       pauseTimer();
       audioRef.current.pause();
-    } else {
-      resumeTimer();
-      audioRef.current.play().catch((err) => console.error("Audio play failed:", err));
     }
-  }
-};
+  };
 
-const handleTouchStart = (e) => {
-  e.stopPropagation();
-  if (audioRef.current && isPlaying) {
-    pauseTimer();
-    audioRef.current.pause();
-  }
-};
-
-const handleTouchEnd = (e) => {
-  e.stopPropagation();
-  if (audioRef.current && !isPlaying) {
-    resumeTimer();
-    audioRef.current.play().catch((err) => console.error("Audio play failed:", err));
-  }
-};
+  const handleTouchEnd = (e) => {
+    e.stopPropagation();
+    if (audioRef.current && !isPlaying) {
+      resumeTimer();
+      audioRef.current
+        .play()
+        .catch((err) => console.error("Audio play failed:", err));
+    }
+  };
 
   useEffect(() => {
     setLoadingProfile(true);
@@ -344,13 +347,13 @@ const handleTouchEnd = (e) => {
   }, [username, token]);
 
   useEffect(() => {
-  if (profileData?.user?.username) {
-    let seenStories = JSON.parse(localStorage.getItem("seenStories") || "{}");
-    setHasSeenStory(!!seenStories[profileData.user.username]);
-  }
-}, [profileData?.user?.username, isStoryModalOpen]);
+    if (profileData?.user?.username) {
+      let seenStories = JSON.parse(localStorage.getItem("seenStories") || "{}");
+      setHasSeenStory(!!seenStories[profileData.user.username]);
+    }
+  }, [profileData?.user?.username, isStoryModalOpen]);
 
-useEffect(() => {
+  useEffect(() => {
     if (
       isStoryModalOpen &&
       userStory &&
@@ -382,7 +385,9 @@ useEffect(() => {
           (stories || []).map(async (story) => {
             if (story.song_id) {
               try {
-                const songRes = await fetch(`${API_URL}/api/songs/${story.song_id}`);
+                const songRes = await fetch(
+                  `${API_URL}/api/songs/${story.song_id}`
+                );
                 if (!songRes.ok) return { ...story, song: null };
                 const songData = await songRes.json();
                 return {
@@ -547,7 +552,7 @@ useEffect(() => {
     fetchTabData();
   }, [activeTab, username, token]);
 
-    useEffect(() => {
+  useEffect(() => {
     if (
       isStoryModalOpen &&
       userStory &&
@@ -558,15 +563,18 @@ useEffect(() => {
       video.currentTime = userStory.video_start || 0;
       video.muted = false;
       video.play().catch(() => {});
-  
+
       const handleTimeUpdate = () => {
-        const end = (userStory.video_end !== undefined ? userStory.video_end : (userStory.video_start || 0) + 15);
+        const end =
+          userStory.video_end !== undefined
+            ? userStory.video_end
+            : (userStory.video_start || 0) + 15;
         if (video.currentTime >= end) {
           video.pause();
         }
       };
       video.addEventListener("timeupdate", handleTimeUpdate);
-  
+
       return () => {
         video.removeEventListener("timeupdate", handleTimeUpdate);
       };
@@ -698,7 +706,7 @@ useEffect(() => {
         <header className="flex flex-col sm:flex-row items-start sm:items-center p-3 sm:p-4 md:p-8 space-y-4 sm:space-y-0 sm:space-x-4 md:space-x-10">
           {/* Profile Picture */}
           <div className="w-20 h-20 sm:w-24 sm:h-24 md:w-32 md:h-32 lg:w-40 lg:h-40 flex-shrink-0 mx-auto sm:mx-0">
-            <div 
+            <div
               onClick={() => {
                 if (userStory) {
                   markStoryAsSeen(profileData.user.username);
@@ -710,17 +718,22 @@ useEffect(() => {
               className={`w-full h-full rounded-full cursor-pointer relative ${
                 userStory
                   ? hasSeenStory
-                    ? 'p-1 bg-gray-200' // outline abu-abu muda jika sudah dilihat
-                    : 'p-1 bg-gradient-to-tr from-blue-500 via-blue-400 to-blue-300' // outline biru jika belum
-                  : ''
+                    ? "p-1 bg-gray-200" // outline abu-abu muda jika sudah dilihat
+                    : "p-1 bg-gradient-to-tr from-blue-500 via-blue-400 to-blue-300" // outline biru jika belum
+                  : ""
               }`}
             >
-              <div className={`w-full h-full rounded-full ${userStory ? 'p-0.5 bg-white' : ''}`}>
+              <div
+                className={`w-full h-full rounded-full ${
+                  userStory ? "p-0.5 bg-white" : ""
+                }`}
+              >
                 <img
                   src={
                     profileData.user.profile_picture_url &&
                     profileData.user.profile_picture_url !== "" &&
-                    profileData.user.profile_picture_url !== "default_profile.png"
+                    profileData.user.profile_picture_url !==
+                      "default_profile.png"
                       ? `${API_URL}${profileData.user.profile_picture_url}`
                       : "/default_profile.png"
                   }
@@ -1054,8 +1067,6 @@ useEffect(() => {
         </div>
       )}
       {isStoryModalOpen && userStories.length > 0 && (
-  
-  
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
           {/* Backdrop */}
           <div
@@ -1064,84 +1075,107 @@ useEffect(() => {
           />
 
           {/* Tombol prev/next */}
-    <button
-      className="absolute left-2 top-1/2 -translate-y-1/2 z-[100] bg-black/40 rounded-full p-2"
-      onClick={e => {
-        e.stopPropagation();
-        setActiveStoryIndex(i => Math.max(i - 1, 0));
-      }}
-      disabled={activeStoryIndex === 0}
-      style={{ pointerEvents: userStories.length > 1 ? "auto" : "none" }}
-    >
-      &lt;
-    </button>
-    <button
-      className="absolute right-2 top-1/2 -translate-y-1/2 z-[100] bg-black/40 rounded-full p-2"
-      onClick={e => {
-        e.stopPropagation();
-        setActiveStoryIndex(i => Math.min(i + 1, userStories.length - 1));
-      }}
-      disabled={activeStoryIndex === userStories.length - 1}
-      style={{ pointerEvents: userStories.length > 1 ? "auto" : "none" }}
-    >
-      &gt;
-    </button>
+          <button
+            className="absolute left-2 top-1/2 -translate-y-1/2 z-[100] bg-black/40 rounded-full p-2"
+            onClick={(e) => {
+              e.stopPropagation();
+              setActiveStoryIndex((i) => Math.max(i - 1, 0));
+            }}
+            disabled={activeStoryIndex === 0}
+            style={{ pointerEvents: userStories.length > 1 ? "auto" : "none" }}
+          >
+            &lt;
+          </button>
+          <button
+            className="absolute right-2 top-1/2 -translate-y-1/2 z-[100] bg-black/40 rounded-full p-2"
+            onClick={(e) => {
+              e.stopPropagation();
+              setActiveStoryIndex((i) =>
+                Math.min(i + 1, userStories.length - 1)
+              );
+            }}
+            disabled={activeStoryIndex === userStories.length - 1}
+            style={{ pointerEvents: userStories.length > 1 ? "auto" : "none" }}
+          >
+            &gt;
+          </button>
 
           {/* Modal Container with 80% Height */}
           <div className="relative w-full max-w-[432px] h-[90vh] bg-black rounded-lg overflow-hidden flex flex-col">
-  <button
-  className={`absolute left-2 top-1/2 -translate-y-1/2 z-[100] bg-black/60 text-white rounded-full w-10 h-10 aspect-square flex items-center justify-center transition
-    ${activeStoryIndex === 0 ? "cursor-not-allowed opacity-60" : "cursor-pointer hover:bg-white/30 hover:scale-110"}`}
-  onClick={e => {
-    e.stopPropagation();
-    setActiveStoryIndex(i => Math.max(i - 1, 0));
-  }}
-  disabled={activeStoryIndex === 0}
-  style={{ pointerEvents: userStories.length > 1 && activeStoryIndex !== 0 ? "auto" : "none" }}
-  aria-label="Sebelumnya"
->
-  &lt;
-</button>
-<button
-  className={`absolute right-2 top-1/2 -translate-y-1/2 z-[100] bg-black/60 text-white rounded-full w-10 h-10 aspect-square flex items-center justify-center transition
-    ${activeStoryIndex === userStories.length - 1 ? "cursor-not-allowed opacity-60" : "cursor-pointer hover:bg-white/30 hover:scale-110"}`}
-  onClick={e => {
-    e.stopPropagation();
-    setActiveStoryIndex(i => Math.min(i + 1, userStories.length - 1));
-  }}
-  disabled={activeStoryIndex === userStories.length - 1}
-  style={{ pointerEvents: userStories.length > 1 && activeStoryIndex !== userStories.length - 1 ? "auto" : "none" }}
-  aria-label="Berikutnya"
->
-  &gt;
-</button>
+            <button
+              className={`absolute left-2 top-1/2 -translate-y-1/2 z-[100] bg-black/60 text-white rounded-full w-10 h-10 aspect-square flex items-center justify-center transition
+    ${
+      activeStoryIndex === 0
+        ? "cursor-not-allowed opacity-60"
+        : "cursor-pointer hover:bg-white/30 hover:scale-110"
+    }`}
+              onClick={(e) => {
+                e.stopPropagation();
+                setActiveStoryIndex((i) => Math.max(i - 1, 0));
+              }}
+              disabled={activeStoryIndex === 0}
+              style={{
+                pointerEvents:
+                  userStories.length > 1 && activeStoryIndex !== 0
+                    ? "auto"
+                    : "none",
+              }}
+              aria-label="Sebelumnya"
+            >
+              &lt;
+            </button>
+            <button
+              className={`absolute right-2 top-1/2 -translate-y-1/2 z-[100] bg-black/60 text-white rounded-full w-10 h-10 aspect-square flex items-center justify-center transition
+    ${
+      activeStoryIndex === userStories.length - 1
+        ? "cursor-not-allowed opacity-60"
+        : "cursor-pointer hover:bg-white/30 hover:scale-110"
+    }`}
+              onClick={(e) => {
+                e.stopPropagation();
+                setActiveStoryIndex((i) =>
+                  Math.min(i + 1, userStories.length - 1)
+                );
+              }}
+              disabled={activeStoryIndex === userStories.length - 1}
+              style={{
+                pointerEvents:
+                  userStories.length > 1 &&
+                  activeStoryIndex !== userStories.length - 1
+                    ? "auto"
+                    : "none",
+              }}
+              aria-label="Berikutnya"
+            >
+              &gt;
+            </button>
 
-  {/* Progress Bar Instagram Style */}
-  <div className="flex gap-1 px-4 pt-2 absolute top-0 left-0 w-full z-50">
-    {userStories.map((story, idx) => (
-      <div
-        key={story.id}
-        className="flex-1 h-1 bg-gray-400/60 rounded overflow-hidden"
-      >
-        <div
-          ref={idx === activeStoryIndex ? progressBarRef : null}
-          className="h-full bg-white transition-all duration-200"
-          style={{
-            width:
-              idx < activeStoryIndex
-                ? "100%"
-                : idx === activeStoryIndex
-                ? undefined // akan di-animate via CSS
-                : "0%",
-            animation:
-              idx === activeStoryIndex
-                ? "progress 15s linear forwards"
-                : "none",
-          }}
-        ></div>
-      </div>
-    ))}
-  </div>
+            {/* Progress Bar Instagram Style */}
+            <div className="flex gap-1 px-4 pt-2 absolute top-0 left-0 w-full z-50">
+              {userStories.map((story, idx) => (
+                <div
+                  key={story.id}
+                  className="flex-1 h-1 bg-gray-400/60 rounded overflow-hidden"
+                >
+                  <div
+                    ref={idx === activeStoryIndex ? progressBarRef : null}
+                    className="h-full bg-white transition-all duration-200"
+                    style={{
+                      width:
+                        idx < activeStoryIndex
+                          ? "100%"
+                          : idx === activeStoryIndex
+                          ? undefined // akan di-animate via CSS
+                          : "0%",
+                      animation:
+                        idx === activeStoryIndex
+                          ? "progress 15s linear forwards"
+                          : "none",
+                    }}
+                  ></div>
+                </div>
+              ))}
+            </div>
 
             {/* Close Button */}
             <button
@@ -1158,7 +1192,8 @@ useEffect(() => {
                   src={
                     profileData.user.profile_picture_url &&
                     profileData.user.profile_picture_url !== "" &&
-                    profileData.user.profile_picture_url !== "default_profile.png"
+                    profileData.user.profile_picture_url !==
+                      "default_profile.png"
                       ? `${API_URL}${profileData.user.profile_picture_url}`
                       : "/default_profile.png"
                   }
@@ -1183,138 +1218,150 @@ useEffect(() => {
               </div>
             </div>
 
-           {/* Media Container (80% height) */}
-<div
-  className="h-[80%] flex items-center justify-center bg-black overflow-y-auto select-none"
-  onTouchStart={(e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    
-    // Pause pada touch start
-    if (audioRef.current && isPlaying) {
-      audioRef.current.pause();
-      if (progressBarRef.current) {
-        progressBarRef.current.style.animationPlayState = "paused";
-      }
-      if (timerRef.current) {
-        cancelAnimationFrame(timerRef.current);
-      }
-      setIsPlaying(false);
-    }
-  }}
-  onTouchEnd={(e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    
-    // Resume pada touch end jika sebelumnya paused
-    if (audioRef.current && !isPlaying) {
-      audioRef.current.play().catch((err) => console.error("Audio play failed:", err));
-      if (progressBarRef.current) {
-        progressBarRef.current.style.animationPlayState = "running";
-      }
-      // Update startTimeRef untuk melanjutkan timer dari posisi saat ini
-      const elapsed = 15000 - timeLeft;
-      startTimeRef.current = Date.now() - elapsed;
-      setIsPlaying(true);
-      updateTimer();
-    }
-  }}
-  onTouchMove={(e) => {
-    e.preventDefault(); // Mencegah scroll dan gesture lainnya
-  }}
-  onContextMenu={(e) => {
-    e.preventDefault(); // Mencegah context menu (long press menu)
-  }}
-  onClick={(e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    
-    // Hanya handle click untuk desktop (bukan touch device)
-    if (!('ontouchstart' in window)) {
-      if (audioRef.current) {
-        if (isPlaying) {
-          // Pause
-          audioRef.current.pause();
-          if (progressBarRef.current) {
-            progressBarRef.current.style.animationPlayState = "paused";
-          }
-          if (timerRef.current) {
-            cancelAnimationFrame(timerRef.current);
-          }
-          setIsPlaying(false);
-        } else {
-          // Resume
-          audioRef.current.play().catch((err) => console.error("Audio play failed:", err));
-          if (progressBarRef.current) {
-            progressBarRef.current.style.animationPlayState = "running";
-          }
-          const elapsed = 15000 - timeLeft;
-          startTimeRef.current = Date.now() - elapsed;
-          setIsPlaying(true);
-          updateTimer();
-        }
-      }
-    }
-  }}
-  style={{
-    userSelect: 'none',
-    WebkitUserSelect: 'none',
-    MozUserSelect: 'none',
-    msUserSelect: 'none',
-    WebkitTouchCallout: 'none', // Mencegah callout pada iOS
-    WebkitTapHighlightColor: 'transparent' // Menghilangkan highlight tap
-  }}
->
-  <div 
-    className="w-full h-full flex items-center"
-    style={{
-      userSelect: 'none',
-      WebkitUserSelect: 'none',
-      pointerEvents: 'none' // Mencegah event pada child elements
-    }}
-  >
-    {userStory.media_type === "image" ? (
-      <img
-        src={`${API_URL}${userStory.media_url}`}
-        alt="Story"
-        className="w-full h-full object-contain"
-        draggable={false}
-        onDragStart={(e) => e.preventDefault()}
-        style={{
-          userSelect: 'none',
-          WebkitUserSelect: 'none',
-          pointerEvents: 'none'
-        }}
-      />
-    ) : (
-      <>
-        <video
-          ref={videoStoryRef}
-          src={`${API_URL}${userStory.media_url}`}
-          autoPlay
-          controls={false}
-          muted={false}
-          className="w-full h-full object-contain"
-          draggable={false}
-          onDragStart={(e) => e.preventDefault()}
-          style={{
-            userSelect: 'none',
-            WebkitUserSelect: 'none',
-            pointerEvents: 'none'
-          }}
-        />
-        {/* Tampilkan tulisan jika tidak ada lagu */}
-      </>
-    )}
-  </div>
-</div>
+            {/* Media Container (80% height) */}
+            <div
+              className="h-[80%] flex items-center justify-center bg-black overflow-y-auto select-none"
+              onTouchStart={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+
+                // Pause pada touch start
+                if (audioRef.current && isPlaying) {
+                  audioRef.current.pause();
+                  if (progressBarRef.current) {
+                    progressBarRef.current.style.animationPlayState = "paused";
+                  }
+                  if (timerRef.current) {
+                    cancelAnimationFrame(timerRef.current);
+                  }
+                  setIsPlaying(false);
+                }
+              }}
+              onTouchEnd={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+
+                // Resume pada touch end jika sebelumnya paused
+                if (audioRef.current && !isPlaying) {
+                  audioRef.current
+                    .play()
+                    .catch((err) => console.error("Audio play failed:", err));
+                  if (progressBarRef.current) {
+                    progressBarRef.current.style.animationPlayState = "running";
+                  }
+                  // Update startTimeRef untuk melanjutkan timer dari posisi saat ini
+                  const elapsed = 15000 - timeLeft;
+                  startTimeRef.current = Date.now() - elapsed;
+                  setIsPlaying(true);
+                  updateTimer();
+                }
+              }}
+              onTouchMove={(e) => {
+                e.preventDefault(); // Mencegah scroll dan gesture lainnya
+              }}
+              onContextMenu={(e) => {
+                e.preventDefault(); // Mencegah context menu (long press menu)
+              }}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+
+                // Hanya handle click untuk desktop (bukan touch device)
+                if (!("ontouchstart" in window)) {
+                  if (audioRef.current) {
+                    if (isPlaying) {
+                      // Pause
+                      audioRef.current.pause();
+                      if (progressBarRef.current) {
+                        progressBarRef.current.style.animationPlayState =
+                          "paused";
+                      }
+                      if (timerRef.current) {
+                        cancelAnimationFrame(timerRef.current);
+                      }
+                      setIsPlaying(false);
+                    } else {
+                      // Resume
+                      audioRef.current
+                        .play()
+                        .catch((err) =>
+                          console.error("Audio play failed:", err)
+                        );
+                      if (progressBarRef.current) {
+                        progressBarRef.current.style.animationPlayState =
+                          "running";
+                      }
+                      const elapsed = 15000 - timeLeft;
+                      startTimeRef.current = Date.now() - elapsed;
+                      setIsPlaying(true);
+                      updateTimer();
+                    }
+                  }
+                }
+              }}
+              style={{
+                userSelect: "none",
+                WebkitUserSelect: "none",
+                MozUserSelect: "none",
+                msUserSelect: "none",
+                WebkitTouchCallout: "none", // Mencegah callout pada iOS
+                WebkitTapHighlightColor: "transparent", // Menghilangkan highlight tap
+              }}
+            >
+              <div
+                className="w-full h-full flex items-center"
+                style={{
+                  userSelect: "none",
+                  WebkitUserSelect: "none",
+                  pointerEvents: "none", // Mencegah event pada child elements
+                }}
+              >
+                {userStory.media_type === "image" ? (
+                  <img
+                    src={`${API_URL}${userStory.media_url}`}
+                    alt="Story"
+                    className="w-full h-full object-contain"
+                    draggable={false}
+                    onDragStart={(e) => e.preventDefault()}
+                    style={{
+                      userSelect: "none",
+                      WebkitUserSelect: "none",
+                      pointerEvents: "none",
+                    }}
+                  />
+                ) : (
+                  <>
+                    <video
+                      ref={videoStoryRef}
+                      src={`${API_URL}${userStory.media_url}`}
+                      autoPlay
+                      controls={false}
+                      muted={false}
+                      className="w-full h-full object-contain"
+                      draggable={false}
+                      onDragStart={(e) => e.preventDefault()}
+                      style={{
+                        userSelect: "none",
+                        WebkitUserSelect: "none",
+                        pointerEvents: "none",
+                      }}
+                    />
+                    {/* Tampilkan tulisan jika tidak ada lagu */}
+                  </>
+                )}
+              </div>
+            </div>
 
             {/* Footer with Audio Controls and Song Info (10% height) */}
             {userStory.song && userStory.song.url ? (
               <div className="h-[10%] z-20 p-4 bg-gradient-to-t from-black/60 to-transparent flex flex-col justify-end">
                 <div className="text-white mb-2">
-                  <p className="font-semibold text-sm">{userStory.song.title}</p>
-                  <p className="text-xs text-white/80">{userStory.song.artist}</p>
+                  <p className="font-semibold text-sm">
+                    {userStory.song.title}
+                  </p>
+                  <p className="text-xs text-white/80">
+                    {userStory.song.artist}
+                  </p>
                 </div>
                 <StoryAudioPlayer
                   audioRef={audioRef}
@@ -1323,20 +1370,20 @@ useEffect(() => {
                   endTime={userStory.song.end_time}
                 />
               </div>
-            ) : userStory.media_type === "video" && (
-              <div className="h-[10%] z-20 p-4 bg-gradient-to-t from-black/60 to-transparent flex flex-col justify-end">
-                <div className="text-white mb-2">
-                  <p className="font-semibold text-xs italic text-gray-300">
-                    Original musik dari video
-                  </p>
+            ) : (
+              userStory.media_type === "video" && (
+                <div className="h-[10%] z-20 p-4 bg-gradient-to-t from-black/60 to-transparent flex flex-col justify-end">
+                  <div className="text-white mb-2">
+                    <p className="font-semibold text-xs italic text-gray-300">
+                      Original musik dari video
+                    </p>
+                  </div>
                 </div>
-              </div>
+              )
             )}
           </div>
         </div>
-        
       )}
-
     </>
   );
 }
@@ -1351,13 +1398,17 @@ function StoryAudioPlayer({ audioRef, src, startTime, endTime }) {
     const handleTimeUpdate = () => {
       if (audioElement.currentTime >= endTime) {
         audioElement.currentTime = startTime;
-        audioElement.play().catch((err) => console.error("Audio play failed:", err));
+        audioElement
+          .play()
+          .catch((err) => console.error("Audio play failed:", err));
       }
     };
 
     audioElement.addEventListener("timeupdate", handleTimeUpdate);
     audioElement.currentTime = startTime;
-    audioElement.play().catch((err) => console.error("Audio play failed:", err));
+    audioElement
+      .play()
+      .catch((err) => console.error("Audio play failed:", err));
 
     return () => {
       // Gunakan referensi yang disimpan untuk cleanup

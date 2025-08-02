@@ -11,7 +11,8 @@ import {
   AcademicCapIcon,
 } from "@heroicons/react/24/solid";
 
-const API_URL = "https://arsipklrpl4025.my.id/backend";
+
+const API_URL = "websitepkl-production.up.railway.app";
 
 const PostGridItem = ({ post, onPostClick }) => (
   <div

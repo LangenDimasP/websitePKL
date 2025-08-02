@@ -5,7 +5,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
-const API_URL = "https://arsipklrpl4025.my.id/backend";
+const API_URL = "websitepkl-production.up.railway.app";
 
 // Helper function untuk membuat pesan notifikasi
 const generateNotificationMessage = (notif) => {

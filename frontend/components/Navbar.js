@@ -16,7 +16,7 @@ import {
     UserIcon
 } from '@heroicons/react/24/outline';
 
-const API_URL = "https://arsipklrpl4025.my.id/backend";
+const API_URL = "websitepkl-production.up.railway.app";
 
 export default function Navbar() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
